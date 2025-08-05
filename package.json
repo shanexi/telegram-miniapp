@@ -1,0 +1,13 @@
+{
+  "name": "telegram-miniapp",
+  "version": "1.0.0",
+  "description": "A simple Telegram Mini App demo",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 3000",
+    "serve": "python3 -m http.server 8080"
+  },
+  "keywords": ["telegram", "miniapp", "webapp"],
+  "author": "",
+  "license": "MIT"
+}

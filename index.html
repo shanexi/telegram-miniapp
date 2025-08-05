@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: var(--tg-theme-text-color, #000000);
+            margin-bottom: 20px;
+        }
+        
+        .demo-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .info {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .button {
+            background: var(--tg-theme-button-color, #007acc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Telegram Mini App Demo</h1>
+        <div class="demo-text">
+            欢迎使用您的第一个 Telegram Mini App！这是一个简单的演示页面。
+        </div>
+        
+        <div class="info">
+            <strong>用户信息：</strong>
+            <div id="user-info">正在加载...</div>
+        </div>
+        
+        <button class="button" onclick="closeApp()">关闭应用</button>
+        <button class="button" onclick="showAlert()">显示提示</button>
+    </div>
+
+    <script>
+        // 初始化 Telegram Web App
+        const tg = window.Telegram.WebApp;
+        
+        // 展开到半屏高度
+        tg.expand();
+        
+        // 设置主按钮
+        tg.MainButton.text = "主要操作";
+        tg.MainButton.show();
+        tg.MainButton.onClick(() => {
+            tg.showAlert("您点击了主按钮！");
+        });
+        
+        // 显示用户信息
+        function displayUserInfo() {
+            const user = tg.initDataUnsafe?.user;
+            const userInfoElement = document.getElementById('user-info');
+            
+            if (user) {
+                userInfoElement.innerHTML = `
+                    <div>姓名: ${user.first_name} ${user.last_name || ''}</div>
+                    <div>用户名: @${user.username || '未设置'}</div>
+                    <div>ID: ${user.id}</div>
+                `;
+            } else {
+                userInfoElement.innerHTML = '无法获取用户信息（可能在非 Telegram 环境中打开）';
+            }
+        }
+        
+        // 关闭应用
+        function closeApp() {
+            if (tg.isExpanded) {
+                tg.close();
+            } else {
+                tg.showAlert("应用将关闭");
+                setTimeout(() => tg.close(), 1000);
+            }
+        }
+        
+        // 显示提示
+        function showAlert() {
+            tg.showAlert("这是来自 Mini App 的提示消息！");
+        }
+        
+        // 准备就绪时通知 Telegram
+        tg.ready();
+        
+        // 显示用户信息
+        displayUserInfo();
+        
+        // 监听主题变化
+        tg.onEvent('themeChanged', function() {
+            console.log('主题已更改');
+        });
+        
+        // 监听视口变化
+        tg.onEvent('viewportChanged', function() {
+            console.log('视口已更改, 高度:', tg.viewportHeight);
+        });
+    </script>
+</body>
+</html>
