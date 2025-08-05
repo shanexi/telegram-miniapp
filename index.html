@@ -3,75 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App</title>
+    <title>Workshop</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            background: var(--tg-theme-bg-color, #1a1a1a);
+            color: var(--tg-theme-text-color, #ffffff);
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px 20px;
+            background: var(--tg-theme-bg-color, #1a1a1a);
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         
-        .container {
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--tg-theme-text-color, #ffffff);
         }
         
-        h1 {
-            color: var(--tg-theme-text-color, #000000);
-            margin-bottom: 20px;
-        }
-        
-        .demo-text {
-            font-size: 18px;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        
-        .info {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .button {
-            background: var(--tg-theme-button-color, #007acc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+        .description {
             font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            line-height: 1.4;
+            margin-bottom: 8px;
         }
         
-        .button:hover {
-            opacity: 0.8;
+        .learn-more {
+            color: var(--tg-theme-link-color, #007acc);
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .learn-more:hover {
+            text-decoration: underline;
+        }
+        
+        .search-container {
+            padding: 20px;
+            background: var(--tg-theme-bg-color, #1a1a1a);
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--tg-theme-secondary-bg-color, #2c2c2e);
+            border: none;
+            border-radius: 10px;
+            color: var(--tg-theme-text-color, #ffffff);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .search-box::placeholder {
+            color: var(--tg-theme-hint-color, #8e8e93);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            background: var(--tg-theme-secondary-bg-color, #2c2c2e);
+        }
+        
+        .section {
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--tg-theme-text-color, #ffffff);
+        }
+        
+        .create-button {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            background: none;
+            border: none;
+            color: var(--tg-theme-link-color, #007acc);
+            font-size: 17px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .create-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--tg-theme-link-color, #007acc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .agent-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #2c2c2e);
+        }
+        
+        .agent-item:last-child {
+            border-bottom: none;
+        }
+        
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .agent-info {
+            flex: 1;
+        }
+        
+        .agent-name {
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--tg-theme-text-color, #ffffff);
+            margin-bottom: 2px;
+        }
+        
+        .agent-handle {
+            font-size: 15px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+        }
+        
+        .chevron {
+            color: var(--tg-theme-hint-color, #8e8e93);
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 Telegram Mini App Demo</h1>
-        <div class="demo-text">
-            欢迎使用您的第一个 Telegram Mini App！这是一个简单的演示页面。
+    <div class="header">
+        <div class="avatar">W</div>
+        <h1 class="title">Workshop</h1>
+        <div class="description">
+            Workshop is the ultimate AI agent platform. Use it to create and manage your AI agents for various tasks.
+        </div>
+        <a href="#" class="learn-more" onclick="showLearnMore()">Learn more ›</a>
+    </div>
+    
+    <div class="search-container">
+        <input type="text" class="search-box" placeholder="🔍 Search" id="search-input">
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">My Agents</h2>
+        
+        <button class="create-button" onclick="createNewAgent()">
+            <div class="create-icon">+</div>
+            Create a New Agent
+        </button>
+        
+        <div class="agent-item" onclick="openAgent('qr-generator')">
+            <div class="agent-avatar" style="background: #5856d6;">Q</div>
+            <div class="agent-info">
+                <div class="agent-name">QR Code Generator</div>
+                <div class="agent-handle">@qr_generator_agent</div>
+            </div>
+            <div class="chevron">›</div>
         </div>
         
-        <div class="info">
-            <strong>用户信息：</strong>
-            <div id="user-info">正在加载...</div>
+        <div class="agent-item" onclick="openAgent('ocr-text')">
+            <div class="agent-avatar" style="background: #ff9500;">O</div>
+            <div class="agent-info">
+                <div class="agent-name">OCR Text Extraction</div>
+                <div class="agent-handle">@ocr_text_agent</div>
+            </div>
+            <div class="chevron">›</div>
         </div>
         
-        <button class="button" onclick="closeApp()">关闭应用</button>
-        <button class="button" onclick="showAlert()">显示提示</button>
+        <div class="agent-item" onclick="openAgent('crypto-assistant')">
+            <div class="agent-avatar" style="background: #32d74b;">🔐</div>
+            <div class="agent-info">
+                <div class="agent-name">加密货币投资顾问助手</div>
+                <div class="agent-handle">@crypto_advisor_agent</div>
+            </div>
+            <div class="chevron">›</div>
+        </div>
+        
+        <div class="agent-item" onclick="openAgent('ai-twitter')">
+            <div class="agent-avatar" style="background: #007acc;">AI</div>
+            <div class="agent-info">
+                <div class="agent-name">AI日报 - Twitter AI情报</div>
+                <div class="agent-handle">@ai_twitter_agent</div>
+            </div>
+            <div class="chevron">›</div>
+        </div>
     </div>
 
     <script>
@@ -81,49 +237,43 @@
         // 展开到半屏高度
         tg.expand();
         
-        // 设置主按钮
-        tg.MainButton.text = "主要操作";
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => {
-            tg.showAlert("您点击了主按钮！");
-        });
+        // 设置主按钮（隐藏，因为我们使用自定义按钮）
+        tg.MainButton.hide();
         
-        // 显示用户信息
-        function displayUserInfo() {
-            const user = tg.initDataUnsafe?.user;
-            const userInfoElement = document.getElementById('user-info');
+        // Learn more 功能
+        function showLearnMore() {
+            tg.showAlert("Workshop 是一个强大的 AI 智能体平台，帮助您创建和管理各种任务的 AI 助手。");
+        }
+        
+        // 创建新智能体
+        function createNewAgent() {
+            tg.showAlert("正在创建新智能体...");
+        }
+        
+        // 打开智能体
+        function openAgent(agentId) {
+            tg.showAlert(`正在打开智能体: ${agentId}`);
+        }
+        
+        // 搜索功能
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const agentItems = document.querySelectorAll('.agent-item');
             
-            if (user) {
-                userInfoElement.innerHTML = `
-                    <div>姓名: ${user.first_name} ${user.last_name || ''}</div>
-                    <div>用户名: @${user.username || '未设置'}</div>
-                    <div>ID: ${user.id}</div>
-                `;
-            } else {
-                userInfoElement.innerHTML = '无法获取用户信息（可能在非 Telegram 环境中打开）';
-            }
-        }
-        
-        // 关闭应用
-        function closeApp() {
-            if (tg.isExpanded) {
-                tg.close();
-            } else {
-                tg.showAlert("应用将关闭");
-                setTimeout(() => tg.close(), 1000);
-            }
-        }
-        
-        // 显示提示
-        function showAlert() {
-            tg.showAlert("这是来自 Mini App 的提示消息！");
-        }
+            agentItems.forEach(item => {
+                const agentName = item.querySelector('.agent-name').textContent.toLowerCase();
+                const agentHandle = item.querySelector('.agent-handle').textContent.toLowerCase();
+                
+                if (agentName.includes(searchTerm) || agentHandle.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = searchTerm ? 'none' : 'flex';
+                }
+            });
+        });
         
         // 准备就绪时通知 Telegram
         tg.ready();
-        
-        // 显示用户信息
-        displayUserInfo();
         
         // 监听主题变化
         tg.onEvent('themeChanged', function() {
