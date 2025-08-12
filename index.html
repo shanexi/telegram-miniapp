@@ -193,41 +193,11 @@
             Create a New Agent
         </button>
         
-        <div class="agent-item" onclick="openAgent('qr-generator')">
-            <div class="agent-avatar" style="background: #5856d6;">Q</div>
-            <div class="agent-info">
-                <div class="agent-name">QR Code Generator</div>
-                <div class="agent-handle">@qr_generator_agent</div>
-            </div>
-            <div class="chevron">›</div>
+        <div id="loading-state" style="display: flex; justify-content: center; align-items: center; padding: 40px; color: var(--tg-theme-hint-color, #8e8e93);">
+            加载中...
         </div>
         
-        <div class="agent-item" onclick="openAgent('ocr-text')">
-            <div class="agent-avatar" style="background: #ff9500;">O</div>
-            <div class="agent-info">
-                <div class="agent-name">OCR Text Extraction</div>
-                <div class="agent-handle">@ocr_text_agent</div>
-            </div>
-            <div class="chevron">›</div>
-        </div>
-        
-        <div class="agent-item" onclick="openAgent('crypto-assistant')">
-            <div class="agent-avatar" style="background: #32d74b;">🔐</div>
-            <div class="agent-info">
-                <div class="agent-name">加密货币投资顾问助手</div>
-                <div class="agent-handle">@crypto_advisor_agent</div>
-            </div>
-            <div class="chevron">›</div>
-        </div>
-        
-        <div class="agent-item" onclick="openAgent('ai-twitter')">
-            <div class="agent-avatar" style="background: #007acc;">AI</div>
-            <div class="agent-info">
-                <div class="agent-name">AI日报 - Twitter AI情报</div>
-                <div class="agent-handle">@ai_twitter_agent</div>
-            </div>
-            <div class="chevron">›</div>
-        </div>
+        <div id="agents-container"></div>
     </div>
 
     <script>
@@ -239,6 +209,87 @@
         
         // 设置主按钮（隐藏，因为我们使用自定义按钮）
         tg.MainButton.hide();
+        
+        // 存储当前的bots数据
+        let currentBots = [];
+        
+        // 获取bot列表的API函数
+        async function fetchBotList() {
+            try {
+                const response = await fetch('https://api.myshell.fun/v1/tg2app/miniapp/get_bot_list', {
+                    method: 'POST',
+                    headers: {
+                        'authority': 'staging-api-v2.myshell.ai',
+                        'myshell-service-name': 'organics-api',
+                        'pragma': 'no-cache',
+                        'Accept-Language': 'zh',
+                        'Sec-Ch-Ua-Mobile': '?1',
+                        'X-Telegram-Init-Data': tg.initData || '',
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data.bots || [];
+            } catch (error) {
+                console.error('Failed to fetch bot list:', error);
+                return [];
+            }
+        }
+        
+        // 渲染bot列表
+        function renderBotList(bots) {
+            const container = document.getElementById('agents-container');
+            const loadingState = document.getElementById('loading-state');
+            
+            // 隐藏加载状态
+            loadingState.style.display = 'none';
+            
+            // 清空容器
+            container.innerHTML = '';
+            
+            if (bots.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--tg-theme-hint-color, #8e8e93);">暂无智能体</div>';
+                return;
+            }
+            
+            bots.forEach((bot, index) => {
+                const agentItem = document.createElement('div');
+                agentItem.className = 'agent-item';
+                agentItem.onclick = () => openAgent(bot.id);
+                
+                // 生成头像背景色
+                const colors = ['#5856d6', '#ff9500', '#32d74b', '#007acc', '#ff2d92', '#5ac8fa'];
+                const backgroundColor = colors[index % colors.length];
+                
+                // 获取名称首字母
+                const firstLetter = bot.name ? bot.name.charAt(0).toUpperCase() : 'B';
+                
+                agentItem.innerHTML = `
+                    <div class="agent-avatar" style="background: ${backgroundColor};">${firstLetter}</div>
+                    <div class="agent-info">
+                        <div class="agent-name">${bot.name}</div>
+                        <div class="agent-handle">@${bot.name.toLowerCase().replace(/\s+/g, '_')}_agent</div>
+                    </div>
+                    <div class="chevron">›</div>
+                    ${bot.selected ? '<div style="color: var(--tg-theme-link-color, #007acc); margin-left: 8px;">✓</div>' : ''}
+                `;
+                
+                container.appendChild(agentItem);
+            });
+        }
+        
+        // 初始化加载bot列表
+        async function initializeBotList() {
+            const bots = await fetchBotList();
+            currentBots = bots;
+            renderBotList(bots);
+        }
         
         // Learn more 功能
         function showLearnMore() {
@@ -258,22 +309,20 @@
         // 搜索功能
         document.getElementById('search-input').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            const agentItems = document.querySelectorAll('.agent-item');
-            
-            agentItems.forEach(item => {
-                const agentName = item.querySelector('.agent-name').textContent.toLowerCase();
-                const agentHandle = item.querySelector('.agent-handle').textContent.toLowerCase();
-                
-                if (agentName.includes(searchTerm) || agentHandle.includes(searchTerm)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = searchTerm ? 'none' : 'flex';
-                }
+            const filteredBots = currentBots.filter(bot => {
+                const name = bot.name.toLowerCase();
+                const handle = `@${bot.name.toLowerCase().replace(/\s+/g, '_')}_agent`;
+                return name.includes(searchTerm) || handle.includes(searchTerm);
             });
+            
+            renderBotList(filteredBots);
         });
         
         // 准备就绪时通知 Telegram
         tg.ready();
+        
+        // 初始化应用
+        initializeBotList();
         
         // 监听主题变化
         tg.onEvent('themeChanged', function() {
