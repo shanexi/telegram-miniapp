@@ -340,7 +340,7 @@
         </button>
         
         <div id="loading-state" style="display: flex; justify-content: center; align-items: center; padding: 40px; color: var(--tg-theme-hint-color, #8e8e93);">
-            加载中...
+            Loading...
         </div>
         
         <div id="agents-container"></div>
@@ -425,7 +425,7 @@
             container.innerHTML = '';
             
             if (bots.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--tg-theme-hint-color, #8e8e93);">暂无智能体</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--tg-theme-hint-color, #8e8e93);">No agents</div>';
                 return;
             }
             
@@ -462,24 +462,24 @@
             renderBotList(bots);
         }
         
-        // Learn more 功能
+        // Learn more functionality
         function showLearnMore() {
-            tg.showAlert("Workshop 是一个强大的 AI 智能体平台，帮助您创建和管理各种任务的 AI 助手。");
+            tg.showAlert("Workshop is a powerful AI agent platform that helps you create and manage AI assistants for various tasks.");
         }
         
-        // 创建新智能体
+        // Create new agent
         function createNewAgent() {
             document.getElementById('new-bot-modal').style.display = 'flex';
         }
         
-        // 关闭新建bot模态框
+        // Close new bot modal
         function closeNewBotModal() {
             document.getElementById('new-bot-modal').style.display = 'none';
-            // 清空表单
+            // Clear form
             document.getElementById('new-bot-form').reset();
         }
         
-        // 获取用户信息
+        // Get user info
         function getUserInfo() {
             const user = tg.initDataUnsafe?.user;
             if (user) {
@@ -493,11 +493,11 @@
             return null;
         }
         
-        // 设置bot token的API调用
+        // Set bot token API call
         async function setBotToken(botToken) {
             const userInfo = getUserInfo();
             if (!userInfo) {
-                throw new Error('无法获取用户信息');
+                throw new Error('Unable to get user information');
             }
             
             const requestData = {
@@ -531,46 +531,46 @@
             }
         }
         
-        // 处理表单提交
+        // Handle form submission
         document.getElementById('new-bot-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const botToken = document.getElementById('bot-token').value.trim();
             
             if (!botToken) {
-                tg.showAlert("请输入Bot Token");
+                tg.showAlert("Please enter Bot Token");
                 return;
             }
             
-            // 验证bot token格式
+            // Validate bot token format
             const tokenPattern = /^\d+:[A-Za-z0-9_-]{35}$/;
             if (!tokenPattern.test(botToken)) {
-                tg.showAlert("Bot Token 格式不正确");
+                tg.showAlert("Bot Token format is incorrect");
                 return;
             }
             
-            // 禁用提交按钮
+            // Disable submit button
             const submitButton = document.getElementById('create-bot-submit');
             const originalText = submitButton.textContent;
             submitButton.disabled = true;
-            submitButton.textContent = '创建中...';
+            submitButton.textContent = 'Creating...';
             
             try {
                 await setBotToken(botToken);
-                tg.showAlert("Bot 创建成功！");
+                tg.showAlert("Bot created successfully!");
                 closeNewBotModal();
-                // 重新加载bot列表
+                // Reload bot list
                 initializeBotList();
             } catch (error) {
-                tg.showAlert(`创建失败: ${error.message}`);
+                tg.showAlert(`Creation failed: ${error.message}`);
             } finally {
-                // 恢复提交按钮
+                // Restore submit button
                 submitButton.disabled = false;
                 submitButton.textContent = originalText;
             }
         });
         
-        // 设置聊天bot的API调用
+        // Set chat bot API call
         async function setChatBot(botId) {
             try {
                 const response = await fetch('https://api.myshell.fun/v1/tg2app/miniapp/set_chat_bot', {
@@ -600,18 +600,18 @@
             }
         }
         
-        // 打开智能体
+        // Open agent
         async function openAgent(agentId) {
             try {
                 await setChatBot(agentId);
-                // 重新加载bot列表以更新选中状态
+                // Reload bot list to update selected state
                 await initializeBotList();
             } catch (error) {
-                tg.showAlert(`设置失败: ${error.message}`);
+                tg.showAlert(`Setting failed: ${error.message}`);
             }
         }
         
-        // 搜索功能
+        // Search functionality
         document.getElementById('search-input').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const filteredBots = currentBots.filter(bot => {
@@ -623,20 +623,20 @@
             renderBotList(filteredBots);
         });
         
-        // 准备就绪时通知 Telegram
+        // Notify Telegram when ready
         tg.ready();
         
-        // 初始化应用
+        // Initialize application
         initializeBotList();
         
-        // 监听主题变化
+        // Listen for theme changes
         tg.onEvent('themeChanged', function() {
-            console.log('主题已更改');
+            console.log('Theme changed');
         });
         
-        // 监听视口变化
+        // Listen for viewport changes
         tg.onEvent('viewportChanged', function() {
-            console.log('视口已更改, 高度:', tg.viewportHeight);
+            console.log('Viewport changed, height:', tg.viewportHeight);
         });
     </script>
 </body>
