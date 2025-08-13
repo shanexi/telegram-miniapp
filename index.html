@@ -354,34 +354,15 @@
         </div>
         <div class="modal-content">
             <p style="color: var(--tg-theme-hint-color, #8e8e93); margin-bottom: 30px; text-align: center;">
-                Enter a name, description and username to create a new bot.
+                Enter your bot token to create a new bot.
             </p>
-            
-            <div style="text-align: center; margin-bottom: 30px;">
-                <button class="camera-button" onclick="selectBotAvatar()">
-                    📷
-                </button>
-            </div>
             
             <form id="new-bot-form">
                 <div class="form-group">
-                    <label class="form-label" for="bot-name">Bot Name</label>
-                    <input type="text" id="bot-name" class="form-input" placeholder="" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="bot-about">About (Optional)</label>
-                    <textarea id="bot-about" class="form-input form-textarea" placeholder=""></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="bot-username">Username</label>
-                    <div class="username-prefix">
-                        <span class="username-prefix-text">t.me/</span>
-                        <input type="text" id="bot-username" class="username-input" placeholder="username_bot" required>
-                    </div>
+                    <label class="form-label" for="bot-token">Bot Token</label>
+                    <input type="text" id="bot-token" class="form-input" placeholder="1234567890:ABCDefGhIjkLmNoPQRstuVWxyZ" required>
                     <div class="username-help">
-                        Choose a username for your bot. It must end in 'bot'. Like this, for example: TetrisBot or tetris_bot.
+                        Get your bot token from @BotFather on Telegram.
                     </div>
                 </div>
                 
@@ -498,45 +479,95 @@
             document.getElementById('new-bot-form').reset();
         }
         
-        // 选择bot头像
-        function selectBotAvatar() {
-            tg.showAlert("头像选择功能即将上线");
+        // 获取用户信息
+        function getUserInfo() {
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                return {
+                    tg_user_id: user.id,
+                    first_name: user.first_name || '',
+                    last_name: user.last_name || '',
+                    username: user.username || ''
+                };
+            }
+            return null;
+        }
+        
+        // 设置bot token的API调用
+        async function setBotToken(botToken) {
+            const userInfo = getUserInfo();
+            if (!userInfo) {
+                throw new Error('无法获取用户信息');
+            }
+            
+            const requestData = {
+                ...userInfo,
+                bot_token: botToken
+            };
+            
+            try {
+                const response = await fetch('https://api.myshell.fun/v1/tg2app/miniapp/set_bot_token', {
+                    method: 'POST',
+                    headers: {
+                        'myshell-service-name': 'organics-api',
+                        'Accept-Language': 'zh',
+                        'Sec-Ch-Ua-Mobile': '?1',
+                        'X-Telegram-Init-Data': tg.initData || '',
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Failed to set bot token:', error);
+                throw error;
+            }
         }
         
         // 处理表单提交
-        document.getElementById('new-bot-form').addEventListener('submit', function(e) {
+        document.getElementById('new-bot-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const botName = document.getElementById('bot-name').value.trim();
-            const botAbout = document.getElementById('bot-about').value.trim();
-            const botUsername = document.getElementById('bot-username').value.trim();
+            const botToken = document.getElementById('bot-token').value.trim();
             
-            if (!botName || !botUsername) {
-                tg.showAlert("请填写必填字段");
+            if (!botToken) {
+                tg.showAlert("请输入Bot Token");
                 return;
             }
             
-            // 验证用户名格式
-            if (!botUsername.toLowerCase().endsWith('bot')) {
-                tg.showAlert("用户名必须以'bot'结尾");
+            // 验证bot token格式
+            const tokenPattern = /^\d+:[A-Za-z0-9_-]{35}$/;
+            if (!tokenPattern.test(botToken)) {
+                tg.showAlert("Bot Token 格式不正确");
                 return;
             }
             
-            // 这里可以添加创建bot的API调用
-            tg.showAlert(`正在创建Bot: ${botName} (@${botUsername})`);
-            closeNewBotModal();
-        });
-        
-        // 自动格式化用户名
-        document.getElementById('bot-username').addEventListener('input', function(e) {
-            let value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            if (value && !value.endsWith('bot')) {
-                // 如果用户正在输入但还没输入bot，不要自动添加
-                if (value.length > 0 && !'bot'.startsWith(value.slice(-3))) {
-                    value = value.replace(/bot$/, '') + '_bot';
-                }
+            // 禁用提交按钮
+            const submitButton = document.getElementById('create-bot-submit');
+            const originalText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = '创建中...';
+            
+            try {
+                await setBotToken(botToken);
+                tg.showAlert("Bot 创建成功！");
+                closeNewBotModal();
+                // 重新加载bot列表
+                initializeBotList();
+            } catch (error) {
+                tg.showAlert(`创建失败: ${error.message}`);
+            } finally {
+                // 恢复提交按钮
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
             }
-            e.target.value = value;
         });
         
         // 打开智能体
