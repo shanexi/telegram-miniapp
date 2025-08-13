@@ -169,6 +169,152 @@
             color: var(--tg-theme-hint-color, #8e8e93);
             font-size: 16px;
         }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--tg-theme-bg-color, #1a1a1a);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #2c2c2e);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #ffffff);
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: var(--tg-theme-link-color, #007acc);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .modal-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--tg-theme-text-color, #ffffff);
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--tg-theme-secondary-bg-color, #2c2c2e);
+            border: none;
+            border-radius: 10px;
+            color: var(--tg-theme-text-color, #ffffff);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-input::placeholder {
+            color: var(--tg-theme-hint-color, #8e8e93);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border: 1px solid var(--tg-theme-link-color, #007acc);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .username-prefix {
+            display: flex;
+            align-items: center;
+            background: var(--tg-theme-secondary-bg-color, #2c2c2e);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .username-prefix-text {
+            padding: 12px 16px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            font-size: 16px;
+            border-right: 1px solid var(--tg-theme-hint-color, #8e8e93);
+        }
+        
+        .username-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 16px;
+            color: var(--tg-theme-text-color, #ffffff);
+            font-size: 16px;
+        }
+        
+        .username-input:focus {
+            outline: none;
+        }
+        
+        .username-help {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .create-bot-button {
+            width: 100%;
+            padding: 14px;
+            background: var(--tg-theme-button-color, #007acc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .create-bot-button:disabled {
+            background: var(--tg-theme-hint-color, #8e8e93);
+            cursor: not-allowed;
+        }
+        
+        .camera-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--tg-theme-secondary-bg-color, #2c2c2e);
+            border: none;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -198,6 +344,52 @@
         </div>
         
         <div id="agents-container"></div>
+    </div>
+
+    <!-- New Bot Modal -->
+    <div id="new-bot-modal" class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">New bot</h2>
+            <button class="close-button" onclick="closeNewBotModal()">Cancel</button>
+        </div>
+        <div class="modal-content">
+            <p style="color: var(--tg-theme-hint-color, #8e8e93); margin-bottom: 30px; text-align: center;">
+                Enter a name, description and username to create a new bot.
+            </p>
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <button class="camera-button" onclick="selectBotAvatar()">
+                    📷
+                </button>
+            </div>
+            
+            <form id="new-bot-form">
+                <div class="form-group">
+                    <label class="form-label" for="bot-name">Bot Name</label>
+                    <input type="text" id="bot-name" class="form-input" placeholder="" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="bot-about">About (Optional)</label>
+                    <textarea id="bot-about" class="form-input form-textarea" placeholder=""></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="bot-username">Username</label>
+                    <div class="username-prefix">
+                        <span class="username-prefix-text">t.me/</span>
+                        <input type="text" id="bot-username" class="username-input" placeholder="username_bot" required>
+                    </div>
+                    <div class="username-help">
+                        Choose a username for your bot. It must end in 'bot'. Like this, for example: TetrisBot or tetris_bot.
+                    </div>
+                </div>
+                
+                <button type="submit" class="create-bot-button" id="create-bot-submit">
+                    Create Bot
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -296,8 +488,56 @@
         
         // 创建新智能体
         function createNewAgent() {
-            tg.showAlert("正在创建新智能体...");
+            document.getElementById('new-bot-modal').style.display = 'flex';
         }
+        
+        // 关闭新建bot模态框
+        function closeNewBotModal() {
+            document.getElementById('new-bot-modal').style.display = 'none';
+            // 清空表单
+            document.getElementById('new-bot-form').reset();
+        }
+        
+        // 选择bot头像
+        function selectBotAvatar() {
+            tg.showAlert("头像选择功能即将上线");
+        }
+        
+        // 处理表单提交
+        document.getElementById('new-bot-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const botName = document.getElementById('bot-name').value.trim();
+            const botAbout = document.getElementById('bot-about').value.trim();
+            const botUsername = document.getElementById('bot-username').value.trim();
+            
+            if (!botName || !botUsername) {
+                tg.showAlert("请填写必填字段");
+                return;
+            }
+            
+            // 验证用户名格式
+            if (!botUsername.toLowerCase().endsWith('bot')) {
+                tg.showAlert("用户名必须以'bot'结尾");
+                return;
+            }
+            
+            // 这里可以添加创建bot的API调用
+            tg.showAlert(`正在创建Bot: ${botName} (@${botUsername})`);
+            closeNewBotModal();
+        });
+        
+        // 自动格式化用户名
+        document.getElementById('bot-username').addEventListener('input', function(e) {
+            let value = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            if (value && !value.endsWith('bot')) {
+                // 如果用户正在输入但还没输入bot，不要自动添加
+                if (value.length > 0 && !'bot'.startsWith(value.slice(-3))) {
+                    value = value.replace(/bot$/, '') + '_bot';
+                }
+            }
+            e.target.value = value;
+        });
         
         // 打开智能体
         function openAgent(agentId) {
